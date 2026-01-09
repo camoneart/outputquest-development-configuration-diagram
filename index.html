@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="ja">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>OUTPUT QUEST　開発構成図</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				font-family:
+					-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+				background: #000;
+				min-height: 100vh;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				overflow: hidden;
+				color: #fff;
+			}
+
+			.container {
+				width: 100vw;
+				height: 100vh;
+				overflow-y: scroll;
+				max-width: 1920px;
+				max-height: 1080px;
+				aspect-ratio: 16 / 9;
+				background: #000;
+				position: relative;
+				display: flex;
+				flex-direction: column;
+				padding: 20px;
+			}
+
+			.header {
+				text-align: center;
+				margin-bottom: 20px;
+			}
+
+			.header h1 {
+				font-size: 1.5em;
+				font-weight: 400;
+				margin-bottom: 6px;
+				color: #fff;
+				letter-spacing: 0.5px;
+			}
+
+			.header p {
+				font-size: 0.8em;
+				color: #666;
+				font-weight: 300;
+			}
+
+			.main-content {
+				flex: 1;
+				display: grid;
+				grid-template-columns: 1fr 0.8fr 1fr;
+				gap: 15px;
+				height: calc(100% - 80px);
+			}
+
+			.card {
+				background: #0a0a0a;
+				border: 1px solid #1a1a1a;
+				border-radius: 8px;
+				padding: 16px;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.card-title {
+				font-size: 0.75em;
+				color: #666;
+				text-transform: uppercase;
+				letter-spacing: 1px;
+				margin-bottom: 12px;
+				font-weight: 500;
+			}
+
+			.tech-grid {
+				display: grid;
+				gap: 8px;
+				flex: 1;
+			}
+
+			.tech-item {
+				background: #000;
+				border: 1px solid #1a1a1a;
+				border-radius: 6px;
+				padding: 12px;
+				transition: all 0.2s ease;
+			}
+
+			.tech-item:hover {
+				border-color: #333;
+				background: #0a0a0a;
+			}
+
+			/* フル幅で表示させたい tech-item 用 */
+			.tech-item-full {
+				grid-column: 1 / -1;
+			}
+
+			.tech-name {
+				font-size: 0.85em;
+				color: #fff;
+				margin-bottom: 2px;
+				font-weight: 400;
+			}
+
+			.tech-desc {
+				font-size: 0.7em;
+				color: #666;
+				font-weight: 300;
+			}
+
+			.architecture-flow {
+				grid-column: span 1;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.flow-container {
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: space-evenly;
+				position: relative;
+				padding: 10px;
+				max-height: 100%;
+			}
+
+			.flow-node {
+				background: #0a0a0a;
+				border: 1px solid #1a1a1a;
+				border-radius: 6px;
+				padding: 8px 16px;
+				width: 80%;
+				max-width: 200px;
+				text-align: center;
+				position: relative;
+				z-index: 2;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+			}
+
+			.flow-node-icon {
+				font-size: 1em;
+				opacity: 0.8;
+			}
+
+			.flow-node-content {
+				flex: 1;
+				text-align: left;
+			}
+
+			.flow-node-title {
+				font-size: 0.75em;
+				color: #fff;
+				font-weight: 400;
+			}
+
+			.flow-node-desc {
+				font-size: 0.65em;
+				color: #666;
+				font-weight: 300;
+			}
+
+			.flow-line {
+				position: absolute;
+				left: 50%;
+				top: 30px;
+				bottom: 30px;
+				width: 1px;
+				background: #1a1a1a;
+				z-index: 1;
+			}
+
+			.flow-arrow {
+				color: #333;
+				font-size: 0.6em;
+				z-index: 3;
+				line-height: 0.5;
+			}
+
+			.column-left {
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+			}
+
+			.column-right {
+				display: flex;
+				flex-direction: column;
+				gap: 15px;
+			}
+
+			.tech-stack {
+				flex: 1;
+			}
+
+			.deployment-items {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 8px;
+			}
+
+			.features-grid {
+				display: grid;
+				grid-template-columns: 1fr;
+				gap: 4px;
+			}
+
+			.feature-item {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				color: #666;
+				font-size: 0.75em;
+				padding: 4px 0;
+				border-bottom: 1px solid #0a0a0a;
+			}
+
+			.feature-item:last-child {
+				border-bottom: none;
+			}
+
+			.feature-icon {
+				color: #fff;
+				font-size: 0.9em;
+			}
+
+			.accent {
+				color: #fff;
+			}
+
+			.version {
+				font-size: 0.65em;
+				color: #444;
+				font-weight: 300;
+			}
+
+			@media (max-height: 768px) {
+				.container {
+					padding: 15px;
+				}
+
+				.header {
+					margin-bottom: 15px;
+				}
+
+				.header h1 {
+					font-size: 1.3em;
+				}
+
+				.card {
+					padding: 12px;
+				}
+
+				.tech-item {
+					padding: 10px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<h1>OUTPUT QUEST <span class="version">開発構成図</span></h1>
+				<p>RPG風学習支援アプリ</p>
+			</div>
+
+			<div class="main-content">
+				<div class="column-left">
+					<div class="card tech-stack">
+						<h3 class="card-title">Frontend</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr">
+							<div class="tech-item">
+								<div class="tech-name">
+									Next.js <span class="version">v16.1.0</span>
+								</div>
+								<div class="tech-desc">React Framework</div>
+							</div>
+							<div class="tech-item">
+								<div class="tech-name">
+									React <span class="version">v19.2.3</span>
+								</div>
+								<div class="tech-desc">UI Library</div>
+							</div>
+							<div class="tech-item">
+								<div class="tech-name">
+									TypeScript <span class="version">v5.9.3</span>
+								</div>
+								<div class="tech-desc">Programming Language</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<h3 class="card-title">Style・UI</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr 1fr">
+							<div class="tech-item">
+								<div class="tech-name">
+									Tailwind CSS <span class="version">v4.1.16</span>
+								</div>
+								<div class="tech-desc">CSS framework</div>
+							</div>
+							<div class="tech-item">
+								<div class="tech-name">shadcn/ui</div>
+								<div class="tech-desc">Component Library</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<h3 class="card-title">Animation・Audio</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr 1fr">
+							<div class="tech-item">
+								<div class="tech-name">
+									Motion <span class="version">v12.23.24</span>
+								</div>
+								<div class="tech-desc">Animation Library</div>
+							</div>
+							<div class="tech-item">
+								<div class="tech-name">
+									Howler.js <span class="version">v2.2.12</span>
+								</div>
+								<div class="tech-desc">Audio Library</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<h3 class="card-title">
+							Authentication・Database・ORM・Validation
+						</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr 1fr">
+							<div class="tech-item">
+								<div class="tech-name">
+									Clerk <span class="version">v6.36.5</span>
+								</div>
+								<div class="tech-desc">Authentication</div>
+							</div>
+							<div class="tech-item">
+								<div class="tech-name">Supabase</div>
+								<div class="tech-desc">Database</div>
+							</div>
+							<div class="tech-item">
+								<div class="tech-name">
+									Prisma <span class="version">v6.18.0</span>
+								</div>
+								<div class="tech-desc">ORM</div>
+							</div>
+							<div class="tech-item">
+								<div class="tech-name">
+									Zod <span class="version">v4.1.12</span>
+								</div>
+								<div class="tech-desc">Schema Validation</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<h3 class="card-title">Webhooks</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr">
+							<div class="tech-item">
+								<div class="tech-name">
+									Svix <span class="version">v1.80.0</span>
+								</div>
+								<div class="tech-desc">Webhooks</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="card architecture-flow">
+					<h3 class="card-title">Architecture Overview</h3>
+					<div class="flow-container">
+						<div class="flow-line"></div>
+
+						<div class="flow-node">
+							<div class="flow-node-icon">👤</div>
+							<div class="flow-node-content">
+								<div class="flow-node-title">Client</div>
+								<div class="flow-node-desc">Browser</div>
+							</div>
+						</div>
+
+						<div class="flow-arrow">↓</div>
+
+						<div class="flow-node">
+							<div class="flow-node-icon">🔑</div>
+							<div class="flow-node-content">
+								<div class="flow-node-title">Clerk Auth</div>
+								<div class="flow-node-desc">Authentication</div>
+							</div>
+						</div>
+
+						<div class="flow-arrow">↓</div>
+
+						<div class="flow-node">
+							<div class="flow-node-icon">⚡</div>
+							<div class="flow-node-content">
+								<div class="flow-node-title">Next.js (App Router)</div>
+								<div class="flow-node-desc">SSR / CSR</div>
+							</div>
+						</div>
+
+						<div class="flow-arrow">↓</div>
+
+						<div class="flow-node">
+							<div class="flow-node-icon">🔧</div>
+							<div class="flow-node-content">
+								<div class="flow-node-title">Server Functions</div>
+								<div class="flow-node-desc">API Routes / Actions</div>
+							</div>
+						</div>
+
+						<div class="flow-arrow">↓</div>
+
+						<div class="flow-node">
+							<div class="flow-node-icon">🔄</div>
+							<div class="flow-node-content">
+								<div class="flow-node-title">Prisma ORM</div>
+								<div class="flow-node-desc">Data Access</div>
+							</div>
+						</div>
+
+						<div class="flow-arrow">↓</div>
+
+						<div class="flow-node">
+							<div class="flow-node-icon">💾</div>
+							<div class="flow-node-content">
+								<div class="flow-node-title">Supabase DB</div>
+								<div class="flow-node-desc">PostgreSQL</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="column-right">
+					<div class="card tech-stack">
+						<h3 class="card-title">AI</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr">
+							<div class="tech-item">
+								<div class="tech-name">
+									Vercel AI SDK <span class="version">v6.0.24</span>
+								</div>
+								<div class="tech-desc">TypeScript Toolkit</div>
+							</div>
+							<div class="tech-item">
+								<div class="tech-name">
+									AI SDK Core <span class="version">v3.0.6</span>
+								</div>
+								<div class="tech-desc">LLM：Gemini</div>
+							</div>
+							<div class="tech-item">
+								<div class="tech-name">
+									AI SDK UI <span class="version">v3.0.25</span>
+								</div>
+								<div class="tech-desc">UI</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<h3 class="card-title">Markdown</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr">
+							<div class="tech-item">
+								<div class="tech-name">
+									React Markdown <span class="version">v10.1.0</span>
+								</div>
+								<div class="tech-desc">Content Parser</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<h3 class="card-title">Hosting</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr">
+							<div class="tech-item">
+								<div class="tech-name">Vercel</div>
+								<div class="tech-desc">Hosting</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<h3 class="card-title">Version Control</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr">
+							<div class="tech-item">
+								<div class="tech-name">GitHub</div>
+								<div class="tech-desc">Version Control</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<h3 class="card-title">Package Manager</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr">
+							<div class="tech-item">
+								<div class="tech-name">
+									pnpm <span class="version">v10.11.1</span>
+								</div>
+								<div class="tech-desc">Package Manager</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="card">
+						<h3 class="card-title">Code Quality</h3>
+						<div class="tech-grid" style="grid-template-columns: 1fr 1fr">
+							<div class="tech-item">
+								<div class="tech-name">Prettier</div>
+								<div class="tech-desc">Code Formatter</div>
+							</div>
+							<div class="tech-item">
+								<div class="tech-name">ESLint</div>
+								<div class="tech-desc">Code Linter</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>
